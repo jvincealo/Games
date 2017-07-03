@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 098e182649824d44688fd4499f15a32c
+timeCreated: 1497889504
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - gameAudio: {fileID: 114000013283266824, guid: b2cd25cb63dba76459776cb23b59c254,
+      type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
