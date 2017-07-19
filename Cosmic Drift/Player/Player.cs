@@ -7,6 +7,7 @@ public class Player : MonoBehaviour {
 
 	int debrisLayer;
 	int enemyLayer;
+	int incomingObsLayer; //incoming obstacle layer mask for raycasting powerups
 	public GameUI gameUI;
 	public GameObject magnet;
 	public CircleCollider2D boosterCollider;
@@ -42,7 +43,7 @@ public class Player : MonoBehaviour {
 		gameAudio = GameObject.FindGameObjectWithTag ("AudioManager").GetComponent<GameManager>();
 		enemyLayer = LayerMask.NameToLayer ("Enemy");
 		debrisLayer = LayerMask.NameToLayer ("Debris");
-
+		incomingObsLayer = LayerMask.GetMask ("Debris", "Enemy");
 		highscoreCoins = PlayerPrefs.GetInt ("coins", highscoreCoins);
 		farthestDistance = PlayerPrefs.GetFloat ("distance", farthestDistance);
 	}
@@ -65,11 +66,30 @@ public class Player : MonoBehaviour {
 	}
 
 	void FixedUpdate(){
+		CheckIncomingObstacle ();
 		IncreaseSpeed ();
 
 		UpdatePowerUpState ();
 		UpdateDashState ();
 
+	}
+
+	bool CheckIncomingObstacle(){ //nearby obstacle checker to ensure safe termination of super fast speeds---booster/dash
+		Vector2 midRayPos = new Vector2 (transform.position.x-0.75f, transform.position.y - 0.05f);
+		Vector2 midTopRayPos = new Vector2 (transform.position.x-0.75f, transform.position.y + 0.5f);
+		Vector2 midBotRayPos = new Vector2 (transform.position.x-0.75f, transform.position.y - 0.55f);
+		Vector2 topRayPos = new Vector2 (transform.position.x-0.75f, transform.position.y + 1);
+		Vector2 bottomRayPos = new Vector2 (transform.position.x-0.75f, transform.position.y - 1.05f);
+		RaycastHit2D hit = Physics2D.Raycast(midRayPos, Vector2.right, 10, incomingObsLayer);
+		RaycastHit2D hit2 = Physics2D.Raycast (topRayPos, Vector2.right, 10, incomingObsLayer);
+		RaycastHit2D hit3 = Physics2D.Raycast(bottomRayPos, Vector2.right, 10, incomingObsLayer);
+		RaycastHit2D hit4 = Physics2D.Raycast(midTopRayPos, Vector2.right, 10, incomingObsLayer);
+		RaycastHit2D hit5 = Physics2D.Raycast(midBotRayPos, Vector2.right, 10, incomingObsLayer);
+		if (hit.collider != null || hit2.collider != null || hit3.collider != null || hit4.collider != null || hit5.collider != null) { //there's an incoming obstacle
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	void IncreaseSpeed(){ //increase speed constantly
@@ -83,7 +103,7 @@ public class Player : MonoBehaviour {
 	void UpdatePowerUpState(){ //manage powerup duration
 		if(boostedSpeed){
 			boosterTimer += Time.deltaTime;
-			if(boosterTimer >= 5){
+			if(boosterTimer >= 5 && !CheckIncomingObstacle()){ //stop if booster duration is up and no incoming obstacles are near
 				boostedSpeed = false;
 				forwardSpeed /= 10;
 				boosterTimer = 0;
@@ -105,9 +125,9 @@ public class Player : MonoBehaviour {
 	void UpdateDashState(){ //manage duration of dash 
 		if(dashing){
 			dashTimer += Time.deltaTime;
-			if(dashTimer >= 0.2f){
+			if(dashTimer >= 0.2f && !CheckIncomingObstacle()){ //stop if dash duration is up and no incoming obstacles are near
 				dashing = false;
-				forwardSpeed /= 20;
+				forwardSpeed /= 10;
 				dashTimer = 0;
 				Physics2D.IgnoreLayerCollision (gameObject.layer, enemyLayer, false);
 				Physics2D.IgnoreLayerCollision (gameObject.layer, debrisLayer, false);
@@ -154,7 +174,7 @@ public class Player : MonoBehaviour {
 		if(dashing){
 			dashing = false;
 			dashTimer = 0;
-			forwardSpeed /= 20;
+			forwardSpeed /= 10;
 		}
 		Physics2D.IgnoreLayerCollision (gameObject.layer, enemyLayer);
 		Physics2D.IgnoreLayerCollision (gameObject.layer, debrisLayer);
@@ -213,7 +233,7 @@ public class Player : MonoBehaviour {
 
 	void Dash(){
 		gameAudio.PlaySfx ("dash");
-		forwardSpeed *= 20;
+		forwardSpeed *= 10;
 		dashing = true;
 		Physics2D.IgnoreLayerCollision (gameObject.layer, enemyLayer);
 		Physics2D.IgnoreLayerCollision (gameObject.layer, debrisLayer);
