@@ -11,10 +11,8 @@ void UWeaponWheelBase::GetCurrentSelected()
 	float targetX = WheelOrigin.X;
 	float targetY = WheelOrigin.Y;
 
-	//UE_LOG(LogTemp, Warning, TEXT("before (%f , %f) >>> (%f , %f)"), WheelOrigin.X, WheelOrigin.Y, targetX, targetY);
 	UWidgetLayoutLibrary::GetMousePositionScaledByDPI(UGameplayStatics::GetPlayerController(GetWorld(), 0), targetX, targetY);
 
-	//UE_LOG(LogTemp, Warning, TEXT("after (%f , %f) >>> (%f , %f)"), WheelOrigin.X, WheelOrigin.Y, targetX, targetY);
 	float Angle = UKismetMathLibrary::FindLookAtRotation(FVector(WheelOrigin.X, WheelOrigin.Y, 0.0f), FVector(targetX, targetY, 0.0f)).Yaw + 90.0f;
 
 	SelectButton(Angle);
@@ -28,9 +26,6 @@ void UWeaponWheelBase::SelectButton(float p_angle)
 	{
 		for (int32 btn_index = 0; btn_index < bSelectedButton.Num(); btn_index++)
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("lower bounds: %f"), LowerBounds);
-			//UE_LOG(LogTemp, Warning, TEXT("higher boundsis: %f"), LowerBounds + AngleInterval);
-			//UE_LOG(LogTemp, Warning, TEXT("angle is: %f"), p_angle);
 			bSelectedButton[i] = (LowerBounds <= p_angle && LowerBounds + AngleInterval > p_angle);
 			if (p_angle < -45.0f && p_angle >= -90.0f)
 			{

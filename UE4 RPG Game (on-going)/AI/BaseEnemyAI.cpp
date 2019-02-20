@@ -108,18 +108,6 @@ void ABaseEnemyAI::OnPawnDetected(const TArray<AActor*> &DetectedPawns)
 		if (DetectedPawns[PawnIndex] == Cast<AActor>(PlayerRef))
 		{
 			Chase();
-			//Chase();
-			//UE_LOG(LogTemp, Warning, TEXT("[BaseEnemyAI] Distance: %f"), FVector::Dist(EnemyBot->GetActorLocation(), PlayerRef->GetActorLocation()));
-			//if (FVector::Dist(EnemyBot->GetActorLocation(), PlayerRef->GetActorLocation()) > EnemyBot->EnemySightRadius)
-			//{
-			//	Idle();
-			//}
-			//else
-			//{
-			//	Chase();
-			//}
-			// If Distance is within range, chase
-			// Else stop
 		}
 	}
 }

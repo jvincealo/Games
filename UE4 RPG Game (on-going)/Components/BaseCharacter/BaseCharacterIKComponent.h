@@ -16,8 +16,6 @@ public:
 	// Sets default values for this component's properties
 	UBaseCharacterIKComponent();
 
-	void SetOwningCharacter(class ACharacter* p_character);
-
 	UFUNCTION(BlueprintCallable, Category = "Base Character Foot IK")
 		void ProcessFootIK(float p_deltaTime);
 
@@ -30,15 +28,6 @@ protected:
 
 	//UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Base Character Foot IK")
 	ACharacter* OwningCharacter;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
-		float MaxFootAlpha = 0.85f;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
-		float MaxHeightDivider = 34.0f; // preferred constant for height checker during foot trace
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
-		float MaxHeightClamp = 0.9f;
 
 public:	
 	// Called every frame
@@ -61,7 +50,7 @@ protected:
 		float LeftEffectorAnim;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
-		float TraceDistance = 150.0f;
+		float TraceDistance = 55.0f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
 		float RightFootOffset;
@@ -73,31 +62,22 @@ protected:
 		float HipOffset;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
-		float AdjustFootOffset;
+		float AdjustFootOffset = 2.0f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
-		float InterpSpeed;
+		float InterpSpeed = 13.0f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
-		float InterpSpeedHip;
+		float InterpSpeedHip = 7.0f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
 		float DeltaTimeSecondsIK;
 
-	UFUNCTION(BlueprintCallable, Category = "Base Character Foot IK")
-		void UpdateFootIK();
-
-	UFUNCTION(BlueprintCallable, Category = "Base Character Fot IK")
-		void ResetFootIKVariables();
-
-	UFUNCTION(BlueprintCallable, Category = "Base Character Foot IK")
-		float FootTraceIK(FName p_socketName);
-
-	UFUNCTION(BlueprintCallable, Category = "Base Character Foot IK")
-		void UpdateFootOffset(float p_targetValue, float& out_effector, float p_interpSpeed);
-
-	UFUNCTION(BlueprintCallable, Category = "Base Character Foot IK")
-		void UpdateCapsuleHalfHeight(float p_hipShift, bool p_resetValue);
+	void UpdateFootIK();
+	void ResetFootIKVariables();
+	float FootTraceIK(FName p_socketName);
+	void UpdateFootOffset(float p_targetValue, float& out_effector, float p_interpSpeed);
+	void UpdateCapsuleHalfHeight(float p_hipShift, bool p_resetValue);
 
 
 };

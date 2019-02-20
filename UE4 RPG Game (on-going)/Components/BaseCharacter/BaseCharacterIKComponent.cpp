@@ -27,11 +27,7 @@ void UBaseCharacterIKComponent::BeginPlay()
 	Super::BeginPlay();
 	OwningCharacter = Cast<ACharacter>(GetOwner());
 	if (OwningCharacter) {
-		UE_LOG(LogTemp, Warning, TEXT("YEEEEEEEEEESSSSSSSSS"));
-	}
-
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("NOOOOOOOOOOOOOOOOO"));
+		CapsuleHalfHeightFootIK = OwningCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	}
 }
 
@@ -49,7 +45,6 @@ void UBaseCharacterIKComponent::ProcessFootIK(float p_deltaTime)
 {
 	if (!OwningCharacter)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("RETURN POTA"));
 		return;
 	}
 
@@ -87,6 +82,7 @@ float UBaseCharacterIKComponent::FootTraceIK(FName p_socketName)
 	UWorld* World = GetWorld();
 	if (World)
 	{
+		DrawDebugLine(World, startPos, endPos, FColor(0, 0, 255), true, 5.0f);
 		FHitResult* HitResult = new FHitResult();
 		if (World->LineTraceSingleByChannel(*HitResult, startPos, endPos, ECC_Visibility))
 		{
@@ -105,7 +101,6 @@ void UBaseCharacterIKComponent::UpdateFootIK()
 {
 	if (bIsUsingFootIK)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("QWEQSDASDASDA"));
 		// Feet line trace to get offset
 		RightFootOffset = FootTraceIK(FName("RightFootSocket_IK"));
 		LeftFootOffset = FootTraceIK(FName("LeftFootSocket_IK"));
@@ -144,13 +139,17 @@ void UBaseCharacterIKComponent::UpdateCapsuleHalfHeight(float p_hipShift, bool p
 
 void UBaseCharacterIKComponent::SetFootIKParams()
 {
-	if (!OwningCharacter || !OwningCharacter->GetMesh() || !OwningCharacter->GetMesh()->GetAnimInstance()) return;
+	if (!OwningCharacter || !OwningCharacter->GetMesh() || !OwningCharacter->GetMesh()->GetAnimInstance())
+	{
+		return;
+	}
+
 	UPlayerAnimInstance* animInstance = Cast<UPlayerAnimInstance>(OwningCharacter->GetMesh()->GetAnimInstance());
 	
 	if (animInstance)
 	{
-		animInstance->RightEffector = FVector(0.0f, 0.0f, RightEffectorAnim);
-		animInstance->LeftEffector = FVector(0.0f, 0.0f, LeftEffectorAnim);
+		animInstance->RightEffector = FVector(RightEffectorAnim * -1.0f, 0.0f, 0.0f);
+		animInstance->LeftEffector = FVector(LeftEffectorAnim, 0.0f, 0.0f);
 		animInstance->HipTranslation = FVector(0.0f, 0.0f, HipOffsetAnim);
 
 	}

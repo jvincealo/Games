@@ -99,8 +99,6 @@ void ARangedWeapon::FireProjectile()
 		FVector SpawnLocation(0.0f, 0.0f, 0.0f);
 		FRotator SpawnRotation(0.0f, 0.0f, 0.0f);
 		ABaseProjectile* const Projectile = World->SpawnActor<ABaseProjectile>(WeaponProjectile, GunMuzzle->GetComponentLocation(), GunMuzzle->GetComponentRotation(), SpawnParams);
-		//ABaseProjectile* const Projectile = World->SpawnActor<ABaseProjectile>(WeaponProjectile, SpawnLocation, SpawnRotation, SpawnParams);
-		//UE_LOG(LogTemp, Warning, TEXT("parent= %s"), GetOwner()->GetName());
 		if (Projectile)
 		{
 			Projectile->ProjectileOwner = GetOwner();

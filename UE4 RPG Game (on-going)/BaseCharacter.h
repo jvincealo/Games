@@ -11,10 +11,6 @@ class THIRDPERSONRPG_API ABaseCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-	// For IK
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Base Character", meta = (AllowPrivateAccess = "true"))
-		class UBaseCharacterIKComponent* BaseIKComp;
-
 public:
 	// Sets default values for this character's properties
 	ABaseCharacter();

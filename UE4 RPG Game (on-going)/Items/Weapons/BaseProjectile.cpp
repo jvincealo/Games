@@ -85,11 +85,9 @@ void ABaseProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 
 void ABaseProjectile::OnBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {	
-	UE_LOG(LogTemp, Warning, TEXT("OVERLAP!"));
 	APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor);
 	if(Player)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("OVERLAP2!"));
 		Player->TogglePerfectDodge(true);
 	}
 }

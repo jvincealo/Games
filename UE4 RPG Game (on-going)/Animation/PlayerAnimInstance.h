@@ -30,33 +30,18 @@ public:
 		FVector LeftEffector;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Foot IK")
-		FVector RightJointPos; // "look at" point between bones
+		FVector RightJointPos;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Foot IK")
-		FVector LeftJointPos; // "look at" point between bones
+		FVector LeftJointPos;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Foot IK")
-		float FootIKStrength;
+		FVector HipTranslation;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Foot IK")
 		float LeftFootAlpha;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Foot IK")
 		float RightFootAlpha;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Foot IK")
-		FVector HipTranslation;
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Foot IK")
-		float RightFootAlphaOld;
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Foot IK")
-		float LeftFootAlphaOld;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Foot IK")
-		float HipOffsetOld = 0;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Foot IK")
-		FVector HipTargetOffset = FVector(0.0f, 0.0f, 0.0f);
 
 };
