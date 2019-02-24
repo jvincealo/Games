@@ -176,11 +176,11 @@ protected:
 protected:
 	// Interpolates Camera's Arm Length to create a smooth zooming effect rather than instant zoom
 	UFUNCTION(BlueprintCallable, Category = "Helper Functions")
-		virtual void SmoothZoom(FVector p_zoomInOffset, FVector p_zoomOutOffset);
+		void SmoothZoom(FVector p_zoomInOffset, FVector p_zoomOutOffset);
 
 	// Adjust player rotation to camera depending if aiming or not
 	UFUNCTION(BlueprintCallable, Category = "Helper Functions")
-		virtual void OrientCharacter();
+		void OrientCharacter();
 
 public:
 	/** Returns CameraBoom subobject **/

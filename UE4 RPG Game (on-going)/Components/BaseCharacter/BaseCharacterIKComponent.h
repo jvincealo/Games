@@ -19,9 +19,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Base Character Foot IK")
 		void ProcessFootIK(float p_deltaTime);
 
-	UFUNCTION(BlueprintCallable, Category = "Base Character Foot IK")
-		void SetFootIKParams();
-
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -50,6 +47,12 @@ protected:
 		float LeftEffectorAnim;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
+		FRotator RightRotationAnim;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
+		FRotator LeftRotationAnim;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
 		float TraceDistance = 55.0f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
@@ -60,6 +63,12 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
 		float HipOffset;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
+		FRotator RightRotation;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
+		FRotator LeftRotation;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base Character Foot IK")
 		float AdjustFootOffset = 2.0f;
@@ -75,9 +84,10 @@ protected:
 
 	void UpdateFootIK();
 	void ResetFootIKVariables();
-	float FootTraceIK(FName p_socketName);
+	float FootTraceIK(FName p_socketName, FRotator& out_footRotation);
+	void UpdateFootRotation(FRotator p_targetValue, FRotator& out_rotator);
 	void UpdateFootOffset(float p_targetValue, float& out_effector, float p_interpSpeed);
 	void UpdateCapsuleHalfHeight(float p_hipShift, bool p_resetValue);
-
+	void UpdateAnimParams();
 
 };

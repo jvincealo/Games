@@ -44,4 +44,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Foot IK")
 		float RightFootAlpha;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Foot IK")
+		FRotator RightRotation;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Foot IK")
+		FRotator LeftRotation;
+
 };

@@ -2,6 +2,7 @@
 
 #include "BaseCharacter.h"
 
+
 // Sets default values
 ABaseCharacter::ABaseCharacter()
 {
@@ -14,6 +15,7 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
 }
 
 // Called every frame

@@ -7,7 +7,10 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Animation/PlayerAnimInstance.h"
+
+#include "Misc/StaticHelpers.h"
 
 #include "Runtime/Engine/Public/DrawDebugHelpers.h"
 
@@ -51,9 +54,8 @@ void UBaseCharacterIKComponent::ProcessFootIK(float p_deltaTime)
 	DeltaTimeSecondsIK = p_deltaTime;
 
 	UPlayerAnimInstance* animInstance = Cast<UPlayerAnimInstance>(OwningCharacter->GetMesh()->GetAnimInstance());
-	if (animInstance->Speed > 0.0f)
+	if (animInstance && animInstance->Speed > 0.0f)
 	{
-		bIsUsingFootIK = true;
 		ResetFootIKVariables();
 	}
 	else
@@ -66,13 +68,16 @@ void UBaseCharacterIKComponent::ResetFootIKVariables()
 {
 	UpdateFootOffset(0.0f, LeftEffectorAnim, InterpSpeed);
 	UpdateFootOffset(0.0f, RightEffectorAnim, InterpSpeed);
+	UpdateFootRotation(FRotator::ZeroRotator, LeftRotationAnim);
+	UpdateFootRotation(FRotator::ZeroRotator, RightRotationAnim);
 	UpdateFootOffset(0.0f, HipOffsetAnim, InterpSpeedHip);
 	UpdateCapsuleHalfHeight(0.0f, true);
+
+	UpdateAnimParams();
 }
 
-float UBaseCharacterIKComponent::FootTraceIK(FName p_socketName)
+float UBaseCharacterIKComponent::FootTraceIK(FName p_socketName, FRotator& out_footRotation)
 {
-	UPlayerAnimInstance* animInstance = Cast<UPlayerAnimInstance>(OwningCharacter->GetMesh()->GetAnimInstance());
 	FVector actorLoc = OwningCharacter->GetActorLocation();
 	FVector socketLoc = OwningCharacter->GetMesh()->GetSocketLocation(p_socketName);
 
@@ -86,6 +91,7 @@ float UBaseCharacterIKComponent::FootTraceIK(FName p_socketName)
 		FHitResult* HitResult = new FHitResult();
 		if (World->LineTraceSingleByChannel(*HitResult, startPos, endPos, ECC_Visibility))
 		{
+			out_footRotation = UStaticHelpers::ConvertNormalToRotator(HitResult->Normal);
 			return (HitResult->Location - HitResult->TraceEnd).Size() - TraceDistance + AdjustFootOffset;
 		}
 		else
@@ -99,14 +105,22 @@ float UBaseCharacterIKComponent::FootTraceIK(FName p_socketName)
 
 void UBaseCharacterIKComponent::UpdateFootIK()
 {
-	if (bIsUsingFootIK)
+	UPlayerAnimInstance* animInstance = Cast<UPlayerAnimInstance>(OwningCharacter->GetMesh()->GetAnimInstance());
+
+	if (animInstance)
 	{
 		// Feet line trace to get offset
-		RightFootOffset = FootTraceIK(FName("RightFootSocket_IK"));
-		LeftFootOffset = FootTraceIK(FName("LeftFootSocket_IK"));
+		RightFootOffset = FootTraceIK(FName("RightFootSocket_IK"), RightRotation);
+		LeftFootOffset = FootTraceIK(FName("LeftFootSocket_IK"), LeftRotation);
+
+		// Update feet rotation
+		UpdateFootRotation(LeftRotation, LeftRotationAnim);
+		UpdateFootRotation(RightRotation, RightRotationAnim);
+		LeftRotationAnim = LeftRotation;
+		RightRotationAnim = RightRotation;
 
 		//Update Hip offset
-		HipOffset = FMath::Min(LeftFootOffset, RightFootOffset);
+		HipOffset = FMath::Max(LeftFootOffset, RightFootOffset);
 		HipOffset = HipOffset > 0 ? 0 : HipOffset; // Set to 0 if larger than 0
 		UpdateFootOffset(HipOffset, HipOffsetAnim, InterpSpeedHip);
 		UpdateCapsuleHalfHeight(HipOffset, false);
@@ -115,14 +129,13 @@ void UBaseCharacterIKComponent::UpdateFootIK()
 		UpdateFootOffset(LeftFootOffset - HipOffset, LeftEffectorAnim, InterpSpeed);
 		UpdateFootOffset(RightFootOffset - HipOffset, RightEffectorAnim, InterpSpeed);
 
-		bool rightNearlyEqual = FMath::IsNearlyEqual(RightFootOffset - HipOffset, RightEffectorAnim, 1.0f);
-		bool leftNearlyEqual = FMath::IsNearlyEqual(LeftFootOffset - HipOffset, LeftEffectorAnim, 1.0f);
-
-		if (leftNearlyEqual && leftNearlyEqual)
-		{
-			bIsUsingFootIK = false; // Disable IK if feet placement are almost on same level
-		}
+		UpdateAnimParams();
 	}
+}
+
+void UBaseCharacterIKComponent::UpdateFootRotation(FRotator p_targetValue, FRotator& out_rotator)
+{
+	out_rotator = FMath::RInterpTo(out_rotator, p_targetValue, DeltaTimeSecondsIK, InterpSpeed);
 }
 
 void UBaseCharacterIKComponent::UpdateFootOffset(float p_targetValue, float& out_effector, float p_interpSpeed)
@@ -137,21 +150,15 @@ void UBaseCharacterIKComponent::UpdateCapsuleHalfHeight(float p_hipShift, bool p
 	OwningCharacter->GetCapsuleComponent()->SetCapsuleHalfHeight(nextVal);
 }
 
-void UBaseCharacterIKComponent::SetFootIKParams()
+void UBaseCharacterIKComponent::UpdateAnimParams()
 {
-	if (!OwningCharacter || !OwningCharacter->GetMesh() || !OwningCharacter->GetMesh()->GetAnimInstance())
-	{
-		return;
-	}
-
 	UPlayerAnimInstance* animInstance = Cast<UPlayerAnimInstance>(OwningCharacter->GetMesh()->GetAnimInstance());
-	
-	if (animInstance)
-	{
-		animInstance->RightEffector = FVector(RightEffectorAnim * -1.0f, 0.0f, 0.0f);
-		animInstance->LeftEffector = FVector(LeftEffectorAnim, 0.0f, 0.0f);
-		animInstance->HipTranslation = FVector(0.0f, 0.0f, HipOffsetAnim);
 
-	}
+	// Set anim instance values
+	animInstance->LeftEffector = FVector(LeftEffectorAnim, 0.0f, 0.0f);;
+	animInstance->RightEffector = FVector(RightEffectorAnim * -1.0f, 0.0f, 0.0f);
+	animInstance->HipTranslation = FVector(0.0f, 0.0f, HipOffsetAnim);
+	animInstance->LeftRotation = LeftRotationAnim;
+	animInstance->RightRotation = RightRotationAnim;
 }
 #pragma endregion
